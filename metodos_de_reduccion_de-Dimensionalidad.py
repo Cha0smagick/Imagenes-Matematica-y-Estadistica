@@ -23,7 +23,7 @@ X, color = make_swiss_roll(n_samples=1500, noise=0.1, random_state=42)
 N_NEIGHBORS = 12  # Número de vecinos para LLE y UMAP
 N_COMPONENTS = 2   # Dimensión de destino (2D)
 
-# ==============================================================================
+# =============================================================================
 # 3. FUNCIÓN DE GENERACIÓN DEL GRÁFICO
 # ==============================================================================
 def generar_grafico_comparativo():
