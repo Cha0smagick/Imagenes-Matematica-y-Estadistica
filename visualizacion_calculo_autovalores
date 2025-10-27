@@ -1,0 +1,159 @@
+# =============================================================================
+# 1. IMPORTACIÓN DE LIBRERÍAS
+# =============================================================================
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+from matplotlib.ticker import MaxNLocator
+
+# =============================================================================
+# 2. DEFINICIÓN DE DATOS Y PARÁMETROS MATEMÁTICOS
+# =============================================================================
+# Matriz de ejemplo A (2x2 para una visualización clara)
+A = np.array([[4, 1], 
+              [2, 3]])
+
+# El polinomio característico p(λ) se deriva de det(A - λI) = 0.
+# Para nuestra matriz A:
+# det([[4-λ, 1], [2, 3-λ]]) = (4-λ)(3-λ) - (1)(2)
+# = 12 - 7λ + λ^2 - 2
+# = λ^2 - 7λ + 10
+#
+# Esta es una función cuadrática p(λ) = λ^2 - 7λ + 10.
+# Los coeficientes son [1, -7, 10] para [λ^2, λ, λ^0].
+poly_coeffs = [1, -7, 10]
+
+# Calculamos los autovalores (raíces del polinomio) para verificar y usarlos en el gráfico.
+# Usamos numpy para precisión.
+eigenvalues = np.roots(poly_coeffs)
+eigenvalues.sort() # Ordenamos para consistencia en el gráfico
+
+# Definimos el rango de λ (eje x) para graficar el polinomio.
+# Se elige un rango que muestre claramente la forma de la parábola y sus raíces.
+lambda_range = np.linspace(eigenvalues[0] - 1.5, eigenvalues[1] + 1.5, 400)
+
+# Evaluamos el polinomio p(λ) para cada valor en el rango.
+p_lambda = np.polyval(poly_coeffs, lambda_range)
+
+# =============================================================================
+# 3. FUNCIÓN DE GENERACIÓN DEL GRÁFICO
+# =============================================================================
+def create_eigenvalue_plot():
+    """
+    Genera y estiliza un gráfico que visualiza el cálculo de autovalores
+    como las raíces del polinomio característico.
+    """
+    # --- Configuración de Estilo y Figura ---
+    # Usamos un estilo que mejora la legibilidad.
+    plt.style.use('seaborn-v0_8-whitegrid')
+    
+    # Creación de la figura con una relación de aspecto 16:9 para PowerPoint.
+    fig, ax = plt.subplots(figsize=(12.8, 7.2))
+
+    # Paleta de colores profesional y amigable con el daltonismo
+    color_poly = '#0072B2'  # Azul
+    color_roots = '#D55E00' # Naranja rojizo
+    color_text = '#333333'  # Gris oscuro para texto
+    
+    # --- Trazado de Datos ---
+    # Graficar el polinomio característico
+    ax.plot(lambda_range, p_lambda, lw=2.5, color=color_poly, label=r'Polinomio Característico $p(\lambda) = \lambda^2 - 7\lambda + 10$')
+    
+    # Graficar el eje y=0 para visualizar dónde están las raíces
+    ax.axhline(0, color='black', lw=1.2, linestyle='--')
+    
+    # Marcar los autovalores (raíces) en el gráfico
+    ax.plot(eigenvalues, [0, 0], 'o', markersize=10, color=color_roots, 
+            markeredgecolor='white', markeredgewidth=1.5,
+            label=f'Autovalores (Raíces): $\lambda_1=${eigenvalues[0]}, $\lambda_2=${eigenvalues[1]}')
+
+    # --- Ajustes Estéticos y Etiquetas ---
+    # Título y subtítulo
+    fig.suptitle(
+        'Visualización del Cálculo de Autovalores', 
+        fontsize=22, 
+        fontweight='bold', 
+        ha='center',
+        color=color_text
+    )
+    ax.set_title(
+        'Los autovalores son las raíces del polinomio característico det(A - λI) = 0',
+        fontsize=16,
+        pad=10,
+        color=color_text
+    )
+    
+    # Etiquetas de los ejes con tipografía clara
+    ax.set_xlabel(r'Valor de $\lambda$', fontsize=14, fontweight='bold', color=color_text)
+    ax.set_ylabel(r'Valor de $p(\lambda)$', fontsize=14, fontweight='bold', color=color_text)
+    
+    # Ajuste de los ticks para que sean números enteros y claros
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    
+    # Estilo de los ticks
+    ax.tick_params(axis='both', which='major', labelsize=12, colors=color_text)
+    
+    # Leyenda
+    legend = ax.legend(loc='upper center', fontsize=12, frameon=True, fancybox=True, shadow=True)
+    legend.get_frame().set_alpha(0.9)
+    
+    # Añadir anotaciones para mayor claridad
+    for ev in eigenvalues:
+        ax.annotate(
+            f'$\\lambda = {ev}$',
+            xy=(ev, 0),
+            xytext=(ev, -2.5),
+            fontsize=12,
+            ha='center',
+            arrowprops=dict(facecolor=color_roots, shrink=0.05, width=1.5, headwidth=8, edgecolor='none')
+        )
+        
+    # Ajustar límites para un encuadre óptimo
+    ax.set_ylim(bottom=min(p_lambda) - 1)
+    
+    return fig, ax
+
+# =============================================================================
+# 4. BLOQUE DE ADICIÓN DEL COPYRIGHT
+# =============================================================================
+def add_copyright(fig):
+    """Añade una marca de agua de copyright a la figura."""
+    fig.text(
+        0.98, 0.02, 
+        "© Alejandro Quintero Ruiz. Generado con Python.",
+        ha='right', 
+        va='bottom', 
+        fontsize=10, 
+        color='gray',
+        alpha=0.8
+    )
+
+# =============================================================================
+# 5. BLOQUE DE GENERACIÓN Y GUARDADO DEL ARCHIVO
+# =============================================================================
+if __name__ == '__main__':
+    # Generar el gráfico
+    main_figure, main_ax = create_eigenvalue_plot()
+    
+    # Añadir el copyright
+    add_copyright(main_figure)
+    
+    # Ajustar el layout para evitar que los elementos se superpongan
+    main_figure.tight_layout(rect=[0, 0.03, 1, 0.95]) # Ajuste para título y copyright
+    
+    # Definir el nombre del archivo de salida
+    output_filename_svg = "visualizacion_autovalores.svg"
+    output_filename_png = "visualizacion_autovalores.png"
+    
+    # Guardar el gráfico en formato vectorial (SVG) y raster (PNG)
+    try:
+        main_figure.savefig(output_filename_svg, format='svg', bbox_inches='tight')
+        main_figure.savefig(output_filename_png, format='png', dpi=300, bbox_inches='tight')
+        print(f"Gráfico guardado exitosamente como '{output_filename_svg}' y '{output_filename_png}'.")
+    except Exception as e:
+        print(f"Error al guardar el gráfico: {e}")
+
+    # Mostrar el gráfico (opcional, útil en entornos interactivos)
+    plt.show()
+
